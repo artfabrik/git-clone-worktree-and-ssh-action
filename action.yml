@@ -51,6 +51,7 @@ runs:
           fi
           git checkout -- .
           git merge -X theirs "origin/${GITHUB_REF_NAME}"
+          cd ../
         else
           git worktree add "${GITHUB_REF_NAME}"
         fi
