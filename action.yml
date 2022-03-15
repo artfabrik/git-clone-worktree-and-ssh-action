@@ -50,12 +50,11 @@ runs:
           if [ "${GITHUB_REF_NAME}" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
             cd ..
             rm -r "${GITHUB_REF_NAME}"        
-            git worktree add "${GITHUB_REF_NAME}"
+            git worktree add -f "${GITHUB_REF_NAME}"
             cd "${GITHUB_REF_NAME}"
           fi
-          git checkout -- .
+          git reset --hard "origin/${GITHUB_REF_NAME}"
           [ "${{inputs.clean}}" == "true" ] && git clean -ffdx
-          git merge -X theirs "origin/${GITHUB_REF_NAME}"
           cd ../
         else
           git worktree add "${GITHUB_REF_NAME}"
