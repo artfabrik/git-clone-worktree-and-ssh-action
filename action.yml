@@ -1,5 +1,9 @@
 name:  Install SSH key and Clone Repo (in separate worktree)
 inputs:
+
+  clean:
+    type: boolean
+    default: false
   sshKey:
     required: true
 runs:
@@ -50,6 +54,7 @@ runs:
             cd "${GITHUB_REF_NAME}"
           fi
           git checkout -- .
+          [ "${{inputs.clean}}" == "true" ] && git clean -ffdx
           git merge -X theirs "origin/${GITHUB_REF_NAME}"
           cd ../
         else
