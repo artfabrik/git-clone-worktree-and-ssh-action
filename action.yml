@@ -1,0 +1,57 @@
+name:  Install SSH key and Clone Repo (in separate worktree)
+inputs:
+  sshKey:
+    required: true
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install SSH key
+      shell: bash
+      run: |
+        SSH_KEY='${{inputs.sshKey}}'
+        sudo mkdir -p ~/.ssh
+        sudo mkdir -p $HOME/.ssh
+        echo "${SSH_KEY}" > ~/.ssh/id_rsa
+        sudo -u root echo "${SSH_KEY}" > $HOME/.ssh/id_rsa
+        # Add GitHub to the SSH known hosts file
+        for ip in $(dig @8.8.8.8 github.com +short); do \
+          ssh-keyscan github.com,$ip; \
+          ssh-keyscan $ip; \
+        done 2>/dev/null >> ~/.ssh/known_hosts
+        chmod 400 ~/.ssh/id_rsa
+        chmod 644 ~/.ssh/known_hosts
+        sudo -u root chmod 400 $HOME/.ssh/id_rsa
+        sudo -u root chmod 644 $HOME/.ssh/known_hosts
+
+    - name: Git clone repo and create worktree
+      shell: bash
+      run: |
+        # clone or update git repo
+
+        if [ -d ".git" ]; then
+          cd .git
+          git remote rm origin
+          git remote add origin git@github.com:${GITHUB_REPOSITORY}.git
+          git fetch --all
+          cd ..
+        else
+          git clone --bare git@github.com:${GITHUB_REPOSITORY}.git .git
+        fi
+      
+        # create or update worktree
+
+        if [ -d "${GITHUB_REF_NAME}" ]; then
+          cd ${GITHUB_REF_NAME}
+          if [ "${GITHUB_REF_NAME}" != "$(git rev-parse --abbrev-ref HEAD)" ]; then
+            cd ..
+            rm -r "${GITHUB_REF_NAME}"        
+            git worktree add "${GITHUB_REF_NAME}"
+            cd "${GITHUB_REF_NAME}"
+          fi
+          git checkout -- .
+          git merge -X theirs "origin/${GITHUB_REF_NAME}"
+        else
+          git worktree add "${GITHUB_REF_NAME}"
+        fi
+        echo "PROJECT_PATH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
