@@ -36,7 +36,7 @@ runs:
           git fetch --all
           cd ..
         else
-          git clone --bare git@github.com:${GITHUB_REPOSITORY}.git .git
+          git clone --mirror git@github.com:${GITHUB_REPOSITORY}.git .git
         fi
       
         # create or update worktree
