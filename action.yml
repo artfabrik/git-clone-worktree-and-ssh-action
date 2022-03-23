@@ -50,7 +50,18 @@ runs:
             git worktree add -f "${GITHUB_REF_NAME}"
             cd "${GITHUB_REF_NAME}"
           fi
+
+          # for files that are 'assume-unchanged' because git reset --hard fails otherwise
+
+          ASSUME_UNCHANGED=$(git ls-files -v | grep '^h' | sed 's/^h //g')
+          if [[ $ASSUME_UNCHANGED = *[![:space:]]* ]]; then
+            echo "resetting assume-unchanged files"
+            echo $ASSUME_UNCHANGED | xargs -n1 git update-index --no-assume-unchanged
+            echo $ASSUME_UNCHANGED | xargs -n1 git checkout --
+          fi
+
           git reset --hard "origin/${GITHUB_REF_NAME}"
+
           [ "${{inputs.clean}}" == "true" ] && git clean -ffdx
           cd ../
         else
