@@ -4,6 +4,10 @@ inputs:
   clean:
     type: boolean
     default: false
+  installSSHKey:
+    type: boolean
+    default: true
+    required: false
   sshKey:
     required: true
 
@@ -12,6 +16,7 @@ runs:
   steps:
     - name: Install SSH key
       shell: bash
+      if: ${{inputs.installSSHKey == 'true'}}
       run: |
         SSH_KEY='${{inputs.sshKey}}'
         sudo mkdir -p ~/.ssh
