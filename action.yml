@@ -56,6 +56,10 @@ runs:
             cd "${GITHUB_REF_NAME}"
           fi
 
+          # be able to have worktree specific config like e.g. hooks
+          git config extensions.worktreeConfig true
+          git config --worktree core.bare false
+
           # for files that are 'assume-unchanged' because git reset --hard fails otherwise
 
           ASSUME_UNCHANGED=$(git ls-files -v | grep '^h' || true | sed 's/^h //g')
