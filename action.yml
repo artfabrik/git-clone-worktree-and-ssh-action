@@ -70,8 +70,6 @@ runs:
             echo $ASSUME_UNCHANGED | xargs -n1 git checkout --
           fi
 
-          git reset --hard "origin/${GITHUB_REF_NAME}"
-
           [ "${{inputs.clean}}" == "true" ] && git clean -ffdx
           cd ../
         else
@@ -85,6 +83,8 @@ runs:
         # be able to have worktree specific config like e.g. hooks
         git config extensions.worktreeConfig true
         git config --worktree core.bare false
+
+        git reset --hard "origin/${GITHUB_REF_NAME}"
 
         git branch --set-upstream-to=origin/${GITHUB_REF_NAME} ${GITHUB_REF_NAME}
         git submodule update --init --recursive
