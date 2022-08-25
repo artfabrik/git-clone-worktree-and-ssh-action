@@ -81,6 +81,11 @@ runs:
         # if repo uses lfs or has submodules
 
         cd ${GITHUB_REF_NAME}
+
+        # be able to have worktree specific config like e.g. hooks
+        git config extensions.worktreeConfig true
+        git config --worktree core.bare false
+
         git branch --set-upstream-to=origin/${GITHUB_REF_NAME} ${GITHUB_REF_NAME}
         git submodule update --init --recursive
         git lfs && git lfs pull
