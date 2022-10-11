@@ -32,6 +32,13 @@ runs:
     - name: Git clone repo and create worktree
       shell: bash
       run: |
+        # check if .git is indeed a git repo (for some reason sometimes most files get deleted in the directory and in the worktrees
+        # and otherwise cleanup all files there
+
+        if ! ([ -d .git ] && cd .git && git rev-parse --is-inside-git-dir); then
+          rm -rf * .*
+        fi
+
         # clone or update git repo
 
         if [ ! -d ".git" ]; then
