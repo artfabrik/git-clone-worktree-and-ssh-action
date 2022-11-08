@@ -35,7 +35,7 @@ runs:
         # check if .git is indeed a git repo (for some reason sometimes most files get deleted in the directory and in the worktrees
         # and otherwise cleanup all files there
 
-        if ! ([ -d .git ] && cd .git && git rev-parse --is-inside-git-dir); then
+        if [ -n "$(ls -A . 2>/dev/null)" ] && ! ([ -d .git ] && cd .git && git rev-parse --is-inside-git-dir); then
           rm -rf * .*
         fi
 
